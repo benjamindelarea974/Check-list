@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Check-list Réanimation — Relève</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --ink:#e9eefc;
+      --muted:#a9b4d6;
+      --accent:#6aa6ff;
+      --accent2:#7cf2c6;
+      --line:rgba(255,255,255,.10);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 700px at 15% 15%, rgba(106,166,255,.18), transparent 55%),
+        radial-gradient(900px 600px at 90% 20%, rgba(124,242,198,.14), transparent 55%),
+        radial-gradient(900px 600px at 30% 85%, rgba(142,108,255,.12), transparent 55%),
+        var(--bg);
+      color: var(--ink);
+    }
+    .wrap{ max-width: 1200px; margin: 0 auto; padding: 28px 18px 60px; }
+    header{ display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin-bottom:18px; }
+    .brand{ display:flex; flex-direction:column; gap:6px; }
+    .brand h1{ font-size: 22px; margin:0; letter-spacing:.2px; }
+    .brand p{ margin:0; color: var(--muted); font-size: 13px; line-height: 1.35; max-width: 760px; }
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 12px; border:1px solid var(--line);
+      border-radius: 999px; background: rgba(255,255,255,.04);
+      box-shadow: var(--shadow); white-space:nowrap;
+      color: var(--muted); font-size:12px;
+    }
+    .pill b{ color: var(--ink); font-weight:600; }
+
+    .grid{ display:grid; grid-template-columns: 1.05fr .95fr; gap: 16px; }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding: 14px 16px; border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      background: rgba(255,255,255,.02);
+    }
+    .card .hd h2{ margin:0; font-size: 15px; letter-spacing:.2px; }
+    .card .bd{ padding: 14px 16px 16px; }
+
+    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    @media (max-width: 520px){ .row{ grid-template-columns: 1fr; } }
+
+    label.small{ display:block; font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+
+    input[type="text"], textarea{
+      width: 100%; padding: 11px 12px;
+      border-radius: 12px; border: 1px solid var(--line);
+      background: rgba(5,10,20,.35);
+      color: var(--ink); outline: none;
+    }
+    textarea{ min-height: 76px; resize: vertical; }
+    input::placeholder, textarea::placeholder{ color: rgba(169,180,214,.6); }
+
+    select{
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(5,10,20,.35);
+      color: var(--ink);
+      outline: none;
+    }
+    select option{ color: #000; }
+
+    .tools{ display:flex; flex-wrap:wrap; gap:10px; margin-top: 10px; }
+    .btn{
+      appearance:none; border: 1px solid var(--line);
+      background: rgba(255,255,255,.04); color: var(--ink);
+      padding: 10px 12px; border-radius: 12px;
+      cursor:pointer; font-weight:600; font-size: 13px;
+      display:inline-flex; align-items:center; gap:10px;
+      transition: transform .05s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+    }
+    .btn:hover{ background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.16); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{ border-color: rgba(106,166,255,.35); background: rgba(106,166,255,.16); }
+    .btn.primary:hover{ background: rgba(106,166,255,.22); }
+    .btn.ok{ border-color: rgba(124,242,198,.35); background: rgba(124,242,198,.14); }
+    .btn.ok:hover{ background: rgba(124,242,198,.18); }
+    .hint{ margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+    .modules{ display:grid; grid-template-columns: 1fr; gap: 10px; }
+    .module{
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,.10);
+    }
+    .module .name{ display:flex; gap:10px; align-items:flex-start; }
+    .module input[type="checkbox"]{
+      width:18px; height:18px; margin-top:1px;
+      accent-color: var(--accent);
+    }
+    .module b{ font-size: 13.5px; font-weight:700; line-height: 1.25; }
+    .module .sub{ color: var(--muted); font-size: 12px; margin-top: 4px; line-height: 1.25; }
+
+    /* Extras (choix de sites) */
+    .extras{
+      margin-top: 10px;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+    }
+    .extras .ttl{
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .choices{ display:flex; flex-wrap:wrap; gap:8px 10px; }
+    .choice{
+      display:flex; align-items:flex-start; gap:8px;
+      padding: 6px 8px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: rgba(0,0,0,.10);
+    }
+    .choice input{ width:16px; height:16px; margin-top:2px; accent-color: var(--accent); }
+    .choice span{ font-size: 12px; color: rgba(233,238,252,.95); line-height: 1.2; }
+
+    .preview{
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .preview .toolbar{
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background: rgba(255,255,255,.02);
+    }
+    .preview .toolbar .title{ display:flex; flex-direction:column; gap:3px; }
+    .preview .toolbar .title h3{ margin:0; font-size: 14px; }
+    .preview .toolbar .title span{ color: var(--muted); font-size: 12px; }
+
+    .doc{ padding: 16px; background: rgba(255,255,255,.02); }
+    .doc .doc-header{
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 12px;
+      background: rgba(0,0,0,.12);
+      margin-bottom: 12px;
+    }
+    .doc .doc-header .line1{
+      display:flex; flex-wrap:wrap; gap:10px 14px;
+      align-items:center; justify-content:space-between;
+    }
+    .doc .doc-header .meta{ color: var(--muted); font-size: 12px; }
+    .doc .doc-header .meta b{ color: var(--ink); }
+    .doc .doc-header .note{
+      margin-top: 8px; color: var(--muted); font-size: 12px; white-space:pre-wrap;
+    }
+
+    .block{
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 12px 10px;
+      background: rgba(0,0,0,.10);
+      margin-bottom: 10px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .block h4{
+      margin: 0 0 8px;
+      font-size: 13.5px;
+      letter-spacing: .2px;
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+    }
+    .block h4 .tag{
+      font-size: 11px;
+      color: rgba(233,238,252,.85);
+      background: rgba(106,166,255,.18);
+      border: 1px solid rgba(106,166,255,.30);
+      padding: 4px 8px;
+      border-radius: 999px;
+      white-space:nowrap;
+    }
+    .block .metaLine{
+      margin: 0 0 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .block .metaLine b{ color: var(--ink); }
+
+    .items{ display:grid; grid-template-columns: 1fr; gap: 6px; }
+    .item{
+      display:flex; gap: 10px; align-items:flex-start;
+      padding: 6px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.02);
+    }
+    .box{
+      width: 16px; height: 16px;
+      border: 2px solid rgba(233,238,252,.8);
+      border-radius: 3px;
+      margin-top: 1px;
+      flex: 0 0 auto;
+    }
+    .item span{ font-size: 12.5px; line-height: 1.25; color: rgba(233,238,252,.95); }
+    .empty{
+      color: var(--muted); font-size: 12px; padding: 14px;
+      border: 1px dashed rgba(255,255,255,.18);
+      border-radius: 14px; background: rgba(0,0,0,.10);
+    }
+
+    @media print{
+      body{ background:#fff; color:#000; }
+      .wrap{ max-width:none; padding:0; }
+      header, .grid > .card { display:none !important; }
+      .grid{ display:block; }
+      .preview{ border:none; box-shadow:none; }
+      .preview .toolbar{ display:none !important; }
+      .doc{ padding:0; background:#fff; }
+      .doc .doc-header{ border: 1px solid #000; background:#fff; }
+      .block{ border: 1px solid #000; background:#fff; }
+      .block h4 .tag{ border: 1px solid #000; background:#fff; color:#000; }
+      .item{ border: 1px solid #000; background:#fff; }
+      .box{ border-color:#000; }
+      .item span{ color:#000; }
+      .empty{ border: 1px dashed #000; background:#fff; color:#000; }
+      @page{ margin: 12mm; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>Check-list Réanimation — Relève</h1>
+        <p>Outil autonome. Sélection des modules → génération d’un document imprimable A4. Éviter les données nominatives si possible.</p>
+      </div>
+      <div class="pill"><span>Accès :</span> <b>Lecteur I:\</b></div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <div class="hd">
+          <h2>Formulaire de sélection</h2>
+          <span class="pill" style="box-shadow:none;background:rgba(255,255,255,.03);">
+            <span style="width:8px;height:8px;border-radius:999px;background:var(--accent2);display:inline-block;"></span>
+            <span>Bibliothèque figée</span>
+          </span>
+        </div>
+
+        <div class="bd">
+          <div class="row">
+            <div>
+              <label class="small">Chambre / Lit</label>
+              <input id="room" type="text" placeholder="Ex : 3B / Lit 2" />
+            </div>
+            <div>
+              <label class="small">Date</label>
+              <input id="date" type="text" placeholder="JJ/MM/AAAA" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label class="small">Identifiant patient (initiales / code)</label>
+              <input id="patient" type="text" placeholder="Ex : A.B. / IPP partiel" />
+            </div>
+            <div>
+              <label class="small">Poids (kg)</label>
+              <input id="weight" type="text" inputmode="decimal" placeholder="Ex : 12.5" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label class="small">Isolement</label>
+              <select id="isolation">
+                <option value="">— sélectionner —</option>
+                <option value="Standard">Standard</option>
+                <option value="Contact">Contact</option>
+                <option value="Gouttelettes">Gouttelettes</option>
+                <option value="Air">Air</option>
+                <option value="Contact + Gouttelettes">Contact + Gouttelettes</option>
+                <option value="Contact + Air">Contact + Air</option>
+              </select>
+            </div>
+            <div>
+              <label class="small">Équipe</label>
+              <input id="team" type="text" placeholder="Ex : J / N — Montante" />
+            </div>
+          </div>
+
+          <div>
+            <label class="small">Notes / points clés (optionnel)</label>
+            <textarea id="notes" placeholder="Objectifs du poste, vigilance particulière..."></textarea>
+          </div>
+
+          <div class="tools">
+            <button class="btn primary" id="btnGenerate" type="button">Générer la check-list</button>
+            <button class="btn ok" id="btnPrint" type="button">Imprimer</button>
+            <button class="btn" id="btnSelectAll" type="button">Tout cocher</button>
+            <button class="btn" id="btnClear" type="button">Tout décocher</button>
+            <button class="btn" id="btnReset" type="button">Réinitialiser</button>
+          </div>
+
+          <div class="hint">
+            Les informations restent sur le poste (stockage local du navigateur), non centralisées.
+          </div>
+
+          <div style="height:14px"></div>
+          <div class="modules" id="modulesList"></div>
+        </div>
+      </section>
+
+      <section class="preview">
+        <div class="toolbar">
+          <div class="title">
+            <h3>Document “Check-list”</h3>
+            <span>Aperçu (ceci est ce qui sera imprimé)</span>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn primary" type="button" onclick="Checklist.generate()">Régénérer</button>
+            <button class="btn ok" type="button" onclick="window.print()">Imprimer</button>
+          </div>
+        </div>
+        <div class="doc" id="doc"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // --- Sites (choix multiples) ---
+    const VVC_SITES = [
+      "Jug Int D","Jug Int G","Sous clavière D","Sous clavière G",
+      "Fémorale D","Fémorale G","PICC-Line Mb Sup D","PICC-Line Mb Sup G"
+    ];
+
+    const KTA_SITES = ["Radiale D","Radiale G","Fémorale D","Fémorale G"];
+
+    const PERI_SITES = ["Lombaire","Thoracique"];
+
+    // --- Bibliothèque modules + items ---
+    const MODULES = [
+      { id: 1, title: "Sécurité patient", subtitle:"Socle sécurité & environnement immédiat",
+        items:[
+          "Identité patient vérifiée (bracelet / dossier / chambre)",
+          "Lit sécurisé : barrières / sonnette accessible",
+          "Accès tête du patient dégagé (urgence)",
+          "Matériel aspiration – ventilation – intubation vérifié"
+        ]},
+      { id: 2, title: "Monitorage", subtitle:"Cibles, alarmes, cohérence des courbes",
+        items:[
+          "Paramètres cibles connus (PA, SpO₂, FR, FC, T°, ETCO₂, TOF, glycémie…)",
+          "Alarmes adaptées et activées (scope, saturomètre, PNI/PI)",
+          "Courbes/valeurs cohérentes",
+          "Capteurs en place et fiables (ECG, SpO₂, PNI/PI) + sites inspectés",
+          "Monitorage visible de l’extérieur"
+        ]},
+      { id: 3, title: "Voies aériennes / Ventilation invasive (VI)", subtitle:"Sonde, ventilateur, capno, aspiration",
+        items:[
+          "Proclive > 30°",
+          "Sonde (TT/trachéo), calibre, repère",
+          "Fixation OK",
+          "Pression ballonnet contrôlée",
+          "Circuit branché et non coudé",
+          "Filtre ou humidification en place",
+          "Paramètres ventilateur conformes à la prescription",
+          "Alarmes ventilateur adaptées et activées",
+          "Capnographie : alarmes adaptées et activées",
+          "Capnographie : courbe affichée visible du couloir",
+          "Aspiration prête (sonde, dépression, système clos si utilisé)"
+
+        ]},
+      { id: 4, title: "Oxygénothérapie / VNI / OHD", subtitle:"Dispositif, réglages, interface, alarmes",
+        items:[
+          "Interface bien positionnée, pas de lésions de pression",
+          "Réglages conformes à la prescription",
+          "Alarmes adaptées et activées (SpO₂ + FR ± capno si indiqué)",
+          "Objectif SpO₂ rappelé"
+        ]},
+      { id: 5, title: "Accès veineux périphérique", subtitle:"VVP : sites, pansements, perméabilité",
+        items:[
+          "Nombre/localisation des VVP connus et visibles",
+          "Sites inspectés : douleur, rougeur, infiltration/extravasation",
+          "Pansements propres, non décollés et datés",
+          "Perméabilité vérifiée si utilisation prévue",
+          "Risque extravasation (médicaments à risque) identifié"
+        ]},
+      { id: 6, title: "Accès veineux central", subtitle:"CVC : pansement, lumières, clamps",
+        items:[
+          "Type/voie connus",
+          "Pansement propre, occlusif, site sans inflammation",
+          "Lumières identifiées (usage de chaque voie) + lignes étiquetées",
+          "Verrouillages/clamps conformes",
+          "Surveillance spécifique (saignement, thrombose, infection) rappelée",
+          "Dernier pansement refait il y moins de 8 jours",
+          "Changement de ligne effectué (Mardi et Vendredi)"
+        ]},
+      { id: 7, title: "Cathéter artériel", subtitle:"Courbe, purge, zéro/level, alarmes",
+        items:[
+          "Site connu (radial/fémoral)",
+          "Point de ponction protégé, risque hémorragique anticipé",
+          "Dernier pansement refait il y moins de 8 jours",
+          "Tubulure sans bulles",
+          "Poche de purge pleine et pression à 200 mmHg",
+          "Niveau et zéro immédiatement contrôlés",
+          "Courbe artérielle fiable et pulsatile",
+          "Alarmes TA réglées et activées"
+
+        ]},
+      { id: 8, title: "Perfusions / PSE / lignes", subtitle:"Identification, étiquetage, organisation, alimentation",
+        items:[
+          "Toutes les PSE identifiées : molécule, concentration, débit, voie",
+          "Étiquetage clair sur seringue ET ligne proche du robinet",
+          "Regroupement sur rampe selon la lumière de perfusion",
+          "Voies dédiées respectées (si applicable)",
+          "Alimentation des PSE"
+
+        ]},
+      { id: 9, title: "PCA", subtitle:"Conformité, programmation, historique",
+        items:[
+          "Molécule ET concentration conformes",
+          "Programmation conforme (Bolus, Période réfractaire, Débit continu, Dose Max 4H)",
+          "Historique relevé",
+          "Remise à zéro immédiate de l’historique"
+        ]},
+      { id: 10, title: "DVE", subtitle:"Niveau, zéro, clamps, sécurisation, visibilité",
+        items:[
+          "Capeline OK" et refection il y moins de 4 jours",
+          "Zéro calé au conduit auditif externe",
+          "Niveau de drainage conforme prescription",
+          "Unité de réglage conforme prescription (cmH₂O / mmHg)",
+          "Prescription de drainage/clampage connue et conforme",
+          "Tous clamps vérifiés",
+          "Tubulures non coudées, connexions, pansement OK",       
+          "Circuit DVE fixé à la potence",
+          "Cordon de sécurité noué",
+          "DVE visible du couloir"
+        ]},
+      { id: 11, title: "PIC", subtitle:"Pansement, courbe, alarmes",
+        items:[
+          "Pansement OK",
+          "Courbe pulsatile",
+          "Alarmes adaptées et activées – limites connues",
+          "Courbe affichée et visible du couloir"
+        ]},
+      { id: 12, title: "Drain thoracique", subtitle:"Aspiration, connexions, bullage, pansement",
+        items:[
+          "Pansement propre, étanche",
+          "Tubulures malade connectée à la cassette",
+          "Verrouillages/clamps conformes",
+          "Drainage liquide / bullage",
+          "Témoin d’aspiration soufflet rouge de la cassette visible",
+          "Niveau d’aspiration sur la cassette conforme à la prescription",
+          "Tubulures aspiration murale connectée à la cassette",
+          "Aspiration murale ouverte à -150 cmH₂O (bouton vert enfoncé)"
+
+        ]},
+      { id: 13, title: "Sonde urinaire", subtitle:"Déclivité, clamps, non-coudure",
+        items:[
+          "Sonde correctement positionnée",
+          "Circuit déclive non coudé (si applicable)",  
+          "Verrouillages/clamps conformes",
+          "Poche de recueil déclive (sous le niveau du matelas)"
+
+        ]},
+      { id: 14, title: "Sonde gastrique", subtitle:"Fixation, repère, aspiration/déclive, NP",
+        items:[
+          "Fixation",
+          "Repère en cm",
+          "Aspiration ou déclive au sac conforme à la prescription",
+          "Verrouillages/clamps conformes",
+          "Nutrition Entérale programmée selon prescription",
+          "Dernier changement de sonde il y moins de 8 jours"
+        ]},
+      { id: 15, title: "Redon", subtitle:"Fixation, aspiration/siphonage, clamps",
+        items:[
+          "Fixation",
+          "Verrouillages/clamps conformes",
+          "Aspiration ou siphonage conforme à la prescription"
+
+        ]},
+      { id: 16, title: "Anti-infectieux (time-sensitive)", subtitle:"Administration + horaire clé",
+        items:[
+          "Anti-infectieux administrés",
+          "Prochaine administration identifiée (horaire clé)"
+        ]},
+      { id: 17, title: "Précautions standard + isolements", subtitle:"Affichage, EPI, circuits",
+        items:[
+          "Type d’isolement confirmé + affichage en chambre",
+          "EPI disponibles au bon endroit + rappel aux équipes/famille",
+          "Circuit linge/déchets conforme + matériel dédié si requis"
+        ]},
+      { id: 18, title: "Plaies / pansements / maintien", subtitle:"Pansements, contentions/attelles, escarres",
+        items:[
+          "Pansements vérifiés (fixation / souillure)",
+          "Dispositifs de maintien (contention/attelles/collier) prescrits en place",
+          "Prévention escarres conforme"
+        ]},
+      { id: 19, title: "Prescriptions récentes non exécutées (file d’attente)", subtitle:"Revue + priorisation",
+        items:[
+          "Revue des prescriptions récentes faite",
+          "Liste des “non faits” identifiée + priorisée"
+        ]},
+      { id: 20, title: "Dispositifs spécifiques", subtitle:"Gabarit pour modules additionnels",
+        items:[
+          "Dispositif spécifique : ____________________",
+          "Réglages/consignes clés connus",
+          "Alarmes/consommables vérifiés",
+          "Traçabilité du poste assurée"
+        ]},
+      { id: 21, title: "Cathéter péridural", subtitle:"Site, tubulure, pansement, PSE",
+        items:[
+          "Pansement occlusif propre",
+          "Tubulure conforme (non coudée, sans air ni sang)",
+          "Tubulure identifiée",
+          "PSE connecté, réglé conformément à la prescription"
+        ]}
+    ];
+
+    const modulesListEl = document.getElementById("modulesList");
+    const docEl = document.getElementById("doc");
+
+    function todayFR(){
+      const d = new Date();
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function getSelected(attr){
+      return Array.from(document.querySelectorAll(`[${attr}]`))
+        .filter(cb => cb.checked)
+        .map(cb => cb.getAttribute(attr));
+    }
+    const getSelectedVvcSites  = () => getSelected("data-vvc-site");
+    const getSelectedKtaSites  = () => getSelected("data-kta-site");
+    const getSelectedPeriSites = () => getSelected("data-peri-site");
+
+    const Checklist = {
+      init() {
+        modulesListEl.innerHTML = "";
+        MODULES.forEach(m => {
+          const el = document.createElement("div");
+          el.className = "module";
+
+          el.innerHTML = `
+            <div class="name">
+              <input type="checkbox" id="m_${m.id}" data-module="${m.id}">
+              <div>
+                <b>${m.id}. ${escapeHtml(m.title)}</b>
+                <div class="sub">${escapeHtml(m.subtitle)}</div>
+
+                ${m.id === 6 ? this.extras("extras_vvc", "Sites VVC (choix multiples)", "vvc", VVC_SITES, "data-vvc-site") : ""}
+
+                ${m.id === 7 ? this.extras("extras_kta", "Sites KtA (choix multiples)", "kta", KTA_SITES, "data-kta-site") : ""}
+
+                ${m.id === 21 ? this.extras("extras_peri", "Site péridural", "peri", PERI_SITES, "data-peri-site") : ""}
+              </div>
+            </div>
+          `;
+          modulesListEl.appendChild(el);
+        });
+
+        this.loadState();
+
+        const dateEl = document.getElementById("date");
+        if (!dateEl.value) dateEl.value = todayFR();
+
+        document.getElementById("btnGenerate").addEventListener("click", () => this.generate());
+        document.getElementById("btnPrint").addEventListener("click", () => window.print());
+        document.getElementById("btnSelectAll").addEventListener("click", () => this.setAll(true));
+        document.getElementById("btnClear").addEventListener("click", () => this.setAll(false));
+        document.getElementById("btnReset").addEventListener("click", () => this.reset());
+
+        document.addEventListener("change", (e) => {
+          if (e.target && e.target.matches('input, textarea, select')) {
+            this.saveState();
+            this.generate();
+          }
+        });
+
+        this.generate();
+      },
+
+      extras(id, title, prefix, list, attr){
+        return `
+          <div class="extras" id="${id}" style="display:none;">
+            <div class="ttl">${escapeHtml(title)}</div>
+            <div class="choices">
+              ${list.map((s,i)=>`
+                <label class="choice">
+                  <input type="checkbox" id="${prefix}_${i}" ${attr}="${escapeHtml(s)}">
+                  <span>${escapeHtml(s)}</span>
+                </label>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      },
+
+      getSelectedModules() {
+        return MODULES.filter(m => !!document.getElementById(`m_${m.id}`)?.checked);
+      },
+
+      getHeaderData() {
+        return {
+          room: document.getElementById("room").value.trim(),
+          date: document.getElementById("date").value.trim(),
+          patient: document.getElementById("patient").value.trim(),
+          weight: document.getElementById("weight").value.trim(),
+          isolation: document.getElementById("isolation").value,
+          team: document.getElementById("team").value.trim(),
+          notes: document.getElementById("notes").value.trim()
+        };
+      },
+
+      updateExtrasVisibility(){
+        const exV = document.getElementById("extras_vvc");
+        const exK = document.getElementById("extras_kta");
+        const exP = document.getElementById("extras_peri");
+
+        if (exV) exV.style.display = !!document.getElementById("m_6")?.checked ? "block" : "none";
+        if (exK) exK.style.display = !!document.getElementById("m_7")?.checked ? "block" : "none";
+        if (exP) exP.style.display = !!document.getElementById("m_21")?.checked ? "block" : "none";
+      },
+
+      generate() {
+        const selected = this.getSelectedModules();
+        const h = this.getHeaderData();
+
+        this.updateExtrasVisibility();
+
+        const header = `
+          <div class="doc-header">
+            <div class="line1">
+              <div class="meta"><b>Check-list de relève</b> — Réanimation</div>
+              <div class="meta">${h.date ? `Date : <b>${escapeHtml(h.date)}</b>` : ""}</div>
+            </div>
+            <div class="line1" style="margin-top:8px;">
+              <div class="meta">Chambre/Lit : <b>${escapeHtml(h.room || "—")}</b></div>
+              <div class="meta">Identifiant : <b>${escapeHtml(h.patient || "—")}</b></div>
+              <div class="meta">Poids : <b>${escapeHtml(h.weight || "—")}</b></div>
+              <div class="meta">Isolement : <b>${escapeHtml(h.isolation || "—")}</b></div>
+              <div class="meta">Équipe : <b>${escapeHtml(h.team || "—")}</b></div>
+            </div>
+            ${h.notes ? `<div class="note"><b>Notes :</b> ${escapeHtml(h.notes)}</div>` : ""}
+          </div>
+        `;
+
+        const vvcSites  = getSelectedVvcSites();
+        const ktaSites  = getSelectedKtaSites();
+        const periSites = getSelectedPeriSites();
+
+        if (!selected.length) {
+          docEl.innerHTML = header + `<div class="empty">Aucun module sélectionné. Coche un ou plusieurs modules.</div>`;
+          return;
+        }
+
+        const blocks = selected.map(m => {
+          let meta = "";
+
+          if (m.id === 6 && vvcSites.length){
+            meta += `<div class="metaLine">Site(s) VVC : <b>${escapeHtml(vvcSites.join(" / "))}</b></div>`;
+          }
+          if (m.id === 7 && ktaSites.length){
+            meta += `<div class="metaLine">Site(s) KtA : <b>${escapeHtml(ktaSites.join(" / "))}</b></div>`;
+          }
+          if (m.id === 21 && periSites.length){
+            meta += `<div class="metaLine">Site : <b>${escapeHtml(periSites.join(" / "))}</b></div>`;
+          }
+
+          return `
+            <section class="block">
+              <h4>
+                <span>${escapeHtml(m.title)}</span>
+                <span class="tag">Module ${m.id}</span>
+              </h4>
+              ${meta}
+              <div class="items">
+                ${m.items.map(it => `
+                  <div class="item">
+                    <div class="box"></div>
+                    <span>${escapeHtml(it)}</span>
+                  </div>
+                `).join("")}
+              </div>
+            </section>
+          `;
+        }).join("");
+
+        docEl.innerHTML = header + blocks;
+      },
+
+      setAll(state) {
+        MODULES.forEach(m => {
+          const cb = document.getElementById(`m_${m.id}`);
+          if (cb) cb.checked = state;
+        });
+        this.saveState();
+        this.generate();
+      },
+
+      reset() {
+        ["room","patient","weight","team","notes"].forEach(id => document.getElementById(id).value = "");
+        document.getElementById("date").value = todayFR();
+        document.getElementById("isolation").value = "";
+        MODULES.forEach(m => { const cb = document.getElementById(`m_${m.id}`); if (cb) cb.checked = false; });
+        document.querySelectorAll('[data-vvc-site],[data-kta-site],[data-peri-site]').forEach(cb => cb.checked = false);
+        localStorage.removeItem("reaChecklistState_v3");
+        this.generate();
+      },
+
+      saveState() {
+        const state = {
+          header: this.getHeaderData(),
+          selected: MODULES.map(m => ({ id: m.id, checked: !!document.getElementById(`m_${m.id}`)?.checked })),
+          vvcSites: getSelectedVvcSites(),
+          ktaSites: getSelectedKtaSites(),
+          periSites: getSelectedPeriSites()
+        };
+        localStorage.setItem("reaChecklistState_v3", JSON.stringify(state));
+      },
+
+      loadState() {
+        try{
+          const raw = localStorage.getItem("reaChecklistState_v3");
+          if(!raw) return;
+          const state = JSON.parse(raw);
+
+          if (state.header){
+            const h = state.header;
+            if (typeof h.room === "string") document.getElementById("room").value = h.room;
+            if (typeof h.patient === "string") document.getElementById("patient").value = h.patient;
+            if (typeof h.weight === "string") document.getElementById("weight").value = h.weight;
+            if (typeof h.team === "string") document.getElementById("team").value = h.team;
+            if (typeof h.notes === "string") document.getElementById("notes").value = h.notes;
+            if (typeof h.date === "string" && h.date) document.getElementById("date").value = h.date;
+            if (typeof h.isolation === "string") document.getElementById("isolation").value = h.isolation;
+          }
+
+          if (Array.isArray(state.selected)){
+            state.selected.forEach(s => {
+              const cb = document.getElementById(`m_${s.id}`);
+              if (cb) cb.checked = !!s.checked;
+            });
+          }
+
+          const restoreChecks = (attr, arr) => {
+            if (!Array.isArray(arr)) return;
+            arr.forEach(val => {
+              const cb = Array.from(document.querySelectorAll(`[${attr}]`))
+                .find(x => x.getAttribute(attr) === val);
+              if (cb) cb.checked = true;
+            });
+          };
+
+          restoreChecks("data-vvc-site", state.vvcSites);
+          restoreChecks("data-kta-site", state.ktaSites);
+          restoreChecks("data-peri-site", state.periSites);
+
+        }catch(e){}
+      }
+    };
+
+    Checklist.init();
+    window.Checklist = Checklist;
+  </script>
+</body>
+</html>
