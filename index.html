@@ -32,6 +32,11 @@
     .brand{ display:flex; flex-direction:column; gap:6px; }
     .brand h1{ font-size: 22px; margin:0; letter-spacing:.2px; }
     .brand p{ margin:0; color: var(--muted); font-size: 13px; line-height: 1.35; max-width: 760px; }
+    .sitehead{
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
     .pill{
       display:inline-flex; align-items:center; gap:10px;
       padding:10px 12px; border:1px solid var(--line);
@@ -117,7 +122,6 @@
     .module b{ font-size: 13.5px; font-weight:700; line-height: 1.25; }
     .module .sub{ color: var(--muted); font-size: 12px; margin-top: 4px; line-height: 1.25; }
 
-    /* Extras (choix de sites) */
     .extras{
       margin-top: 10px;
       padding: 10px 10px;
@@ -228,6 +232,9 @@
       border-radius: 14px; background: rgba(0,0,0,.10);
     }
 
+    .printFooter{ display:none; }
+    .pf-left{ font-size: 9px; }
+
     @media print{
       body{ background:#fff; color:#000; }
       .wrap{ max-width:none; padding:0; }
@@ -243,6 +250,17 @@
       .box{ border-color:#000; }
       .item span{ color:#000; }
       .empty{ border: 1px dashed #000; background:#fff; color:#000; }
+      .printFooter{
+        display:flex !important;
+        position: fixed;
+        left: 12mm;
+        right: 12mm;
+        bottom: 8mm;
+        justify-content: flex-start;
+        align-items: center;
+        font-size: 9px;
+        color: #000;
+      }
       @page{ margin: 12mm; }
     }
   </style>
@@ -253,6 +271,7 @@
     <header>
       <div class="brand">
         <h1>Check-list Réanimation — Relève</h1>
+        <div class="sitehead">Réanimation pédiatrique - St Pierre - CHU Réunion</div>
         <p>Outil autonome. Sélection des modules → génération d’un document imprimable A4. Éviter les données nominatives si possible.</p>
       </div>
       <div class="pill"><span>Accès :</span> <b>Lecteur I:\</b></div>
@@ -282,8 +301,8 @@
 
           <div class="row">
             <div>
-              <label class="small">Identifiant patient (initiales / code)</label>
-              <input id="patient" type="text" placeholder="Ex : A.B. / IPP partiel" />
+              <label class="small">Prénom NOM patient</label>
+              <input id="patient" type="text" placeholder="Ex : Emma DUPONT" />
             </div>
             <div>
               <label class="small">Poids (kg)</label>
@@ -349,7 +368,6 @@
   </div>
 
   <script>
-    // --- Sites (choix multiples) ---
     const VVC_SITES = [
       "Jug Int D","Jug Int G","Sous clavière D","Sous clavière G",
       "Fémorale D","Fémorale G","PICC-Line Mb Sup D","PICC-Line Mb Sup G"
@@ -359,7 +377,6 @@
 
     const PERI_SITES = ["Lombaire","Thoracique"];
 
-    // --- Bibliothèque modules + items ---
     const MODULES = [
       { id: 1, title: "Sécurité patient", subtitle:"Socle sécurité & environnement immédiat",
         items:[
@@ -389,7 +406,6 @@
           "Capnographie : alarmes adaptées et activées",
           "Capnographie : courbe affichée visible du couloir",
           "Aspiration prête (sonde, dépression, système clos si utilisé)"
-
         ]},
       { id: 4, title: "Oxygénothérapie / VNI / OHD", subtitle:"Dispositif, réglages, interface, alarmes",
         items:[
@@ -413,20 +429,19 @@
           "Lumières identifiées (usage de chaque voie) + lignes étiquetées",
           "Verrouillages/clamps conformes",
           "Surveillance spécifique (saignement, thrombose, infection) rappelée",
-          "Dernier pansement refait il y moins de 8 jours",
+          "Dernier pansement refait il y a moins de 8 jours",
           "Changement de ligne effectué (Mardi et Vendredi)"
         ]},
       { id: 7, title: "Cathéter artériel", subtitle:"Courbe, purge, zéro/level, alarmes",
         items:[
           "Site connu (radial/fémoral)",
           "Point de ponction protégé, risque hémorragique anticipé",
-          "Dernier pansement refait il y moins de 8 jours",
+          "Dernier pansement refait il y a moins de 8 jours",
           "Tubulure sans bulles",
           "Poche de purge pleine et pression à 200 mmHg",
           "Niveau et zéro immédiatement contrôlés",
           "Courbe artérielle fiable et pulsatile",
           "Alarmes TA réglées et activées"
-
         ]},
       { id: 8, title: "Perfusions / PSE / lignes", subtitle:"Identification, étiquetage, organisation, alimentation",
         items:[
@@ -435,7 +450,6 @@
           "Regroupement sur rampe selon la lumière de perfusion",
           "Voies dédiées respectées (si applicable)",
           "Alimentation des PSE"
-
         ]},
       { id: 9, title: "PCA", subtitle:"Conformité, programmation, historique",
         items:[
@@ -446,13 +460,13 @@
         ]},
       { id: 10, title: "DVE", subtitle:"Niveau, zéro, clamps, sécurisation, visibilité",
         items:[
-          "Capeline OK" et refection il y moins de 4 jours",
+          "Capeline OK et réfection il y a moins de 4 jours",
           "Zéro calé au conduit auditif externe",
           "Niveau de drainage conforme prescription",
           "Unité de réglage conforme prescription (cmH₂O / mmHg)",
           "Prescription de drainage/clampage connue et conforme",
           "Tous clamps vérifiés",
-          "Tubulures non coudées, connexions, pansement OK",       
+          "Tubulures non coudées, connexions, pansement OK",
           "Circuit DVE fixé à la potence",
           "Cordon de sécurité noué",
           "DVE visible du couloir"
@@ -474,15 +488,13 @@
           "Niveau d’aspiration sur la cassette conforme à la prescription",
           "Tubulures aspiration murale connectée à la cassette",
           "Aspiration murale ouverte à -150 cmH₂O (bouton vert enfoncé)"
-
         ]},
       { id: 13, title: "Sonde urinaire", subtitle:"Déclivité, clamps, non-coudure",
         items:[
           "Sonde correctement positionnée",
-          "Circuit déclive non coudé (si applicable)",  
+          "Circuit déclive non coudé (si applicable)",
           "Verrouillages/clamps conformes",
           "Poche de recueil déclive (sous le niveau du matelas)"
-
         ]},
       { id: 14, title: "Sonde gastrique", subtitle:"Fixation, repère, aspiration/déclive, NP",
         items:[
@@ -490,15 +502,14 @@
           "Repère en cm",
           "Aspiration ou déclive au sac conforme à la prescription",
           "Verrouillages/clamps conformes",
-          "Nutrition Entérale programmée selon prescription",
-          "Dernier changement de sonde il y moins de 8 jours"
+          "Nutrition entérale programmée selon prescription",
+          "Dernier changement de sonde il y a moins de 8 jours"
         ]},
       { id: 15, title: "Redon", subtitle:"Fixation, aspiration/siphonage, clamps",
         items:[
           "Fixation",
           "Verrouillages/clamps conformes",
           "Aspiration ou siphonage conforme à la prescription"
-
         ]},
       { id: 16, title: "Anti-infectieux (time-sensitive)", subtitle:"Administration + horaire clé",
         items:[
@@ -664,17 +675,20 @@
         const header = `
           <div class="doc-header">
             <div class="line1">
-              <div class="meta"><b>Check-list de relève</b> — Réanimation</div>
+              <div class="meta"><b>Check-list de relève</b> — Réanimation pédiatrique - St Pierre - CHU Réunion</div>
               <div class="meta">${h.date ? `Date : <b>${escapeHtml(h.date)}</b>` : ""}</div>
             </div>
             <div class="line1" style="margin-top:8px;">
               <div class="meta">Chambre/Lit : <b>${escapeHtml(h.room || "—")}</b></div>
-              <div class="meta">Identifiant : <b>${escapeHtml(h.patient || "—")}</b></div>
+              <div class="meta">Patient : <b>${escapeHtml(h.patient || "—")}</b></div>
               <div class="meta">Poids : <b>${escapeHtml(h.weight || "—")}</b></div>
               <div class="meta">Isolement : <b>${escapeHtml(h.isolation || "—")}</b></div>
               <div class="meta">Équipe : <b>${escapeHtml(h.team || "—")}</b></div>
             </div>
             ${h.notes ? `<div class="note"><b>Notes :</b> ${escapeHtml(h.notes)}</div>` : ""}
+            <div class="printFooter">
+              <span class="pf-left">Patient : ${escapeHtml(h.patient || "—")}</span>
+            </div>
           </div>
         `;
 
